@@ -1,0 +1,15 @@
+export const INVALID_ADDRESS = 'Dirección inválida';
+export const INVALID_SIGNATURE = 'Firma inválida';
+export const INVALID_MIMETYPE = 'Tipo MIME inválido';
+export const INVALID_CALLID = 'Identificador de llamado incorrecto';
+export const INVALID_PROPOSAL = 'Formato de propuesta incorrecto';
+export const INVALID_TIME_FORMAT = 'Formato de tiempo incorrecto';
+export const INVALID_CLOSING_TIME = 'Tiempo de cierre inválido';
+export const ALREADY_AUTHORIZED = 'Ya está autorizado';
+export const ALREADY_CREATED = 'El llamado ya existe';
+export const ALREADY_REGISTERED = 'La propuesta ya ha sido registrada';
+export const CALLID_NOT_FOUND = 'El llamado no existe';
+export const PROPOSAL_NOT_FOUND = 'La propuesta no existe';
+export const UNAUTHORIZED = 'No autorizado';
+export const INTERNAL_ERROR = 'Error interno';
+export const OK = 'OK'; 
