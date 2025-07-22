@@ -1,97 +1,72 @@
-import axios from 'axios';
-import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
+// Este archivo se mantiene por compatibilidad con código existente
+// Se recomienda usar CallService y ContractService en su lugar
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { CallService } from './callService';
+import { ContractService } from './contractService';
 
-export interface Call {
-  callId: string;
-  closingTime: string | null;
-  creator: string;
-  cfp?: string;
-}
+// Re-exportar interfaces para compatibilidad
+export type { Call, ProposalData, SignedProposalData } from './callService';
+export type { ContractAddresses } from './contractService';
 
-export interface ProposalData {
-  sender: string;
-  blockNumber: number;
-  timestamp: string;
-}
-
-export interface SignedProposalData extends ProposalData {
-  signer: string;
-  signature: string;
-}
-
+// Mantener la API existente pero delegar a los nuevos servicios
 export const apiService = {
   async getHealth() {
-    const response = await api.get(API_ENDPOINTS.HEALTH);
-    return response.data;
+    return CallService.getHealth();
   },
 
   async getCall(callId: string) {
-    const response = await api.get<Call>(`${API_ENDPOINTS.CALLS}/${callId}`);
-    return response.data;
+    return CallService.getCall(callId);
   },
 
   async registerProposal(callId: string, proposal: string) {
-    const response = await api.post(API_ENDPOINTS.REGISTER_PROPOSAL, {
-      callId,
-      proposal,
-    });
-    return response.data;
+    return CallService.registerProposal(callId, proposal);
   },
 
   async registerProposalWithSignature(callId: string, proposal: string, signature: string, signer: string) {
-    const response = await api.post(API_ENDPOINTS.REGISTER_PROPOSAL, {
-      callId,
-      proposal,
-      signature,
-      signer,
-    });
-    return response.data;
+    return CallService.registerProposalWithSignature(callId, proposal, signature, signer);
   },
 
   async getProposalData(callId: string, proposal: string) {
-    const response = await api.get<ProposalData>(
-      `${API_ENDPOINTS.PROPOSAL_DATA}/${callId}/${proposal}`
-    );
-    return response.data;
+    return CallService.getProposalData(callId, proposal);
   },
 
   async verifyProposalWithSignature(callId: string, proposal: string) {
-    const response = await api.get<{
-      isValid: boolean;
-      signer?: string;
-      message?: string;
-    }>(`${API_ENDPOINTS.VERIFY_PROPOSAL}/${callId}/${proposal}`);
-    return response.data;
+    return CallService.verifyProposalWithSignature(callId, proposal);
   },
 
   async getClosingTime(callId: string) {
-    const response = await api.get(`${API_ENDPOINTS.CLOSING_TIME}/${callId}`);
-    return response.data;
+    return CallService.getClosingTime(callId);
   },
 
   async getCalls() {
-    const response = await api.get<Call[]>(API_ENDPOINTS.CALLS);
-    return response.data;
+    return CallService.getCalls();
   },
 
   async getContractAddress() {
-    const response = await api.get<{ address: string }>(API_ENDPOINTS.CONTRACT_ADDRESS);
-    return response.data.address;
+    const data = await ContractService.getContractAddresses();
+    return data.cfpFactoryAddress;
   },
 
   async createCall(callId: string, closingTimeIso: string, signature: string) {
-    const response = await api.post(API_ENDPOINTS.CREATE_CALL, {
+    return CallService.createCall({
       callId,
       closingTime: closingTimeIso,
       signature,
     });
-    return response.data;
+  },
+
+  async createCallWithENS(callId: string, closingTimeIso: string, signature: string, callName: string, description?: string) {
+    return CallService.createCallWithENS({
+      callId,
+      closingTime: closingTimeIso,
+      signature,
+      callName,
+      description,
+    });
+  },
+
+  async getProposalCounts(callIds: string[]) {
+    const callIdsParam = callIds.join(',');
+    return CallService.getProposalCounts(callIdsParam);
   },
 }; 

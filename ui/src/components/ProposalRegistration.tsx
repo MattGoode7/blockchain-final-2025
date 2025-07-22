@@ -58,35 +58,37 @@ export function ProposalRegistration({ callId }: ProposalRegistrationProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2 mb-2">
-        <ArrowUpTrayIcon className="h-6 w-6 text-primary" />
-        <h3 className="text-lg font-bold bg-clip-text text-black drop-shadow-md opacity-100 ">Registrar Propuesta</h3>
+    <div className="h-full flex flex-col">
+      <div className="flex items-center space-x-2 mb-4">
+        <ArrowUpTrayIcon className="h-6 w-6 text-blue-400" />
+        <h3 className="text-lg font-bold text-white">Registrar Propuesta</h3>
       </div>
-      <p className="text-text-light text-sm mb-4">Sube el archivo de tu propuesta para registrarla en el sistema.</p>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <p className="text-gray-300 text-sm mb-6 flex-grow">Sube el archivo de tu propuesta para registrarla en el sistema.</p>
+      <form onSubmit={handleSubmit} className="space-y-4 flex-grow flex flex-col">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-text">Seleccionar archivo</label>
+          <label className="block text-sm font-medium text-white">Seleccionar archivo</label>
           <input
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={handleFileChange}
-            className="block w-full text-sm text-text-light file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+            className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-600 hover:file:bg-blue-200"
           />
         </div>
         {error && (
-          <div className="p-4 text-red-500 bg-red-50 rounded-lg">{error}</div>
+          <div className="p-4 text-red-500 bg-red-50 rounded-lg text-sm break-words">{error}</div>
         )}
         {success && (
-          <div className="p-4 text-green-500 bg-green-50 rounded-lg">Propuesta registrada exitosamente</div>
+          <div className="p-4 text-green-500 bg-green-50 rounded-lg text-sm">Propuesta registrada exitosamente</div>
         )}
-        <button
-          type="submit"
-          disabled={!file || loading}
-          className="w-full py-2 px-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Registrando...' : 'Registrar Propuesta'}
-        </button>
+        <div className="mt-auto">
+          <button
+            type="submit"
+            disabled={!file || loading}
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Registrando...' : 'Registrar Propuesta'}
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -6,17 +6,23 @@ import { CallsModule } from './calls/calls.module';
 import { ProposalsModule } from './proposals/proposals.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { HealthController } from './health.controller';
+import { contractsConfig } from './config/contracts.config';
+import { ENSService } from './contracts/ens.service';
+import { ENSController } from './contracts/ens.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      load: [contractsConfig],
+    }),
     Web3Module,
     ContractsModule,
     CallsModule,
     ProposalsModule,
     AuthorizationModule,
   ],
-  controllers: [HealthController],
-  providers: [],
+  controllers: [HealthController, ENSController],
+  providers: [ENSService],
 })
 export class AppModule {}

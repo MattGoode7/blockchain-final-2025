@@ -1,13 +1,14 @@
 import { ethers } from 'ethers';
+import { CFP__factory } from '../types/factories';
 
 export class CFPService {
-  private contract: ethers.Contract;
+  private contract: ReturnType<typeof CFP__factory.connect>;
 
-  constructor(contract: ethers.Contract) {
+  constructor(contract: ReturnType<typeof CFP__factory.connect>) {
     this.contract = contract;
   }
 
-  async registerProposal(proposal: string): Promise<ethers.TransactionReceipt> {
+  async registerProposal(proposal: string): Promise<ethers.ContractTransactionReceipt | null> {
     const tx = await this.contract.registerProposal(proposal);
     return await tx.wait();
   }
@@ -27,8 +28,8 @@ export class CFPService {
       proposals.push({
         id: proposal,
         sender: data.sender,
-        blockNumber: data.blockNumber,
-        timestamp: data.timestamp
+        blockNumber: Number(data.blockNumber),
+        timestamp: Number(data.timestamp)
       });
     }
     

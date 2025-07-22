@@ -1,15 +1,16 @@
 import { ethers } from 'ethers';
-import CFPFactoryABI from '../../../contracts/build/contracts/CFPFactory.json';
-import CFPABI from '../../../contracts/build/contracts/CFP.json';
+import { CFPFactory__factory, CFP__factory } from '../types/factories';
 import { FactoryService } from './factoryService.ts';
-import type { FactoryContract } from './factoryService.ts';
 import { CFPService } from './cfpService.ts';
-import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
+import { ENSService } from './ensService.ts';
+import { ContractService } from './contractService';
+import { CFPApiService } from './cfpApiService';
 
 export class EthereumService {
   private provider: ethers.BrowserProvider | null = null;
   public signer: ethers.Signer | null = null;
   public factoryService: FactoryService | null = null;
+  public ensService: ENSService | null = null;
   public factoryAddress: string | null = null;
   private expectedChainId: number = 1337; // Ajustar según la red que uses
   private currentAddress: string | null = null;
@@ -57,21 +58,23 @@ export class EthereumService {
         throw new Error(`Por favor conéctate a la red correcta (Chain ID: ${this.expectedChainId})`);
       }
 
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CONTRACT_ADDRESS}`);
-      const data = await response.json();
-      this.factoryAddress = data.address;
+      const data = await ContractService.getContractAddresses();
+      this.factoryAddress = data.cfpFactoryAddress;
 
       if (!this.factoryAddress) {
         throw new Error('No se pudo obtener la dirección del contrato');
       }
 
-      const factoryContract = new ethers.Contract(
+      const factoryContract = CFPFactory__factory.connect(
         this.factoryAddress,
-        CFPFactoryABI.abi,
         this.signer
-      ) as unknown as FactoryContract;
+      );
 
       this.factoryService = new FactoryService(factoryContract, this.signer);
+
+      // Inicializar servicio ENS
+      this.ensService = new ENSService(this.signer);
+      await this.ensService.initializeContracts();
 
       this.setupListeners();
 
@@ -86,6 +89,7 @@ export class EthereumService {
     this.provider = null;
     this.signer = null;
     this.factoryService = null;
+    this.ensService = null;
     this.factoryAddress = null;
     this.currentAddress = null;
   }
@@ -117,14 +121,13 @@ export class EthereumService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CALLS}/${callId}`);
-      const data = await response.json();
+      const data = await CFPApiService.getCfpInfo(callId);
 
       if (!data.cfp) {
         throw new Error('No se encontró el contrato CFP');
       }
 
-      const cfpContract = new ethers.Contract(data.cfp, CFPABI.abi, this.signer);
+      const cfpContract = CFP__factory.connect(data.cfp, this.signer);
       return new CFPService(cfpContract);
     } catch (error) {
       console.error('Error al obtener el servicio CFP:', error);
@@ -196,6 +199,13 @@ export class EthereumService {
       console.error('Error al firmar mensaje:', error);
       throw error;
     }
+  }
+
+  /**
+   * Obtiene el servicio ENS inicializado
+   */
+  getENSService(): ENSService | null {
+    return this.ensService;
   }
 }
 

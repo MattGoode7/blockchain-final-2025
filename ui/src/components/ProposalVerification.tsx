@@ -64,29 +64,29 @@ export function ProposalVerification({ callId }: ProposalVerificationProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2 mb-2">
-        <MagnifyingGlassCircleIcon className="h-6 w-6 text-primary" />
-        <h3 className="text-lg font-bold bg-clip-text text-black drop-shadow-md opacity-100">Verificar Propuesta</h3>
+    <div className="h-full flex flex-col">
+      <div className="flex items-center space-x-2 mb-4">
+        <MagnifyingGlassCircleIcon className="h-6 w-6 text-blue-400" />
+        <h3 className="text-lg font-bold text-white">Verificar Propuesta</h3>
       </div>
-      <p className="text-text-light text-sm mb-4">Selecciona el archivo de la propuesta para verificar si ya fue registrada en el sistema.</p>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <p className="text-gray-300 text-sm mb-6 flex-grow">Selecciona el archivo de la propuesta para verificar si ya fue registrada en el sistema.</p>
+      <form onSubmit={handleSubmit} className="space-y-4 flex-grow flex flex-col">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-text">Seleccionar archivo</label>
+          <label className="block text-sm font-medium text-white">Seleccionar archivo</label>
           <input
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={handleFileChange}
-            className="block w-full text-sm text-text-light file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+            className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-600 hover:file:bg-blue-200"
           />
         </div>
         {error && (
-          <div className="p-4 text-red-500 bg-red-50 rounded-lg break-words overflow-auto max-w-full w-full">
+          <div className="p-4 text-red-500 bg-red-50 rounded-lg text-sm break-words">
             {error}
           </div>
         )}
         {verificationResult && (
-          <div className={`p-4 rounded-lg break-words overflow-auto max-w-full w-full ${
+          <div className={`p-4 rounded-lg text-sm break-words ${
             verificationResult.exists
               ? 'bg-green-50 text-green-700'
               : 'bg-yellow-50 text-yellow-700'
@@ -94,24 +94,24 @@ export function ProposalVerification({ callId }: ProposalVerificationProps) {
             {verificationResult.exists ? (
               <div className="space-y-2">
                 <p className="font-semibold">Propuesta encontrada</p>
-                <div className="text-sm">
-                  <p>Registrada por: <span className="break-all">{verificationResult.data?.sender}</span></p>
-                  <p>Bloque: {verificationResult.data?.blockNumber}</p>
-                  <p>Fecha: {verificationResult.data?.timestamp}</p>
-                </div>
               </div>
             ) : (
-              <p>La propuesta no ha sido registrada</p>
+              <div className="space-y-2">
+                <p className="font-semibold">Propuesta no encontrada</p>
+                <p className="text-sm">La propuesta no ha sido registrada en el sistema.</p>
+              </div>
             )}
           </div>
         )}
-        <button
-          type="submit"
-          disabled={!file || loading}
-          className="w-full py-2 px-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Verificando...' : 'Verificar Propuesta'}
-        </button>
+        <div className="mt-auto">
+          <button
+            type="submit"
+            disabled={!file || loading}
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Verificando...' : 'Verificar Propuesta'}
+          </button>
+        </div>
       </form>
     </div>
   );

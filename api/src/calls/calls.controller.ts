@@ -1,6 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { CallsService } from './calls.service';
 import { CreateCallDto } from './dto/create-call.dto';
+
+interface CreateCallWithENSDto {
+  callId: string;
+  closingTime: string;
+  signature: string;
+  callName: string;
+  description?: string;
+}
 
 @Controller()
 export class CallsController {
@@ -9,6 +17,11 @@ export class CallsController {
   @Post('create')
   create(@Body() dto: CreateCallDto) {
     return this.callsService.create(dto);
+  }
+
+  @Post('create-with-ens')
+  createWithENS(@Body() dto: CreateCallWithENSDto) {
+    return this.callsService.createWithENS(dto);
   }
 
   @Get('calls')
@@ -34,5 +47,11 @@ export class CallsController {
   @Get('contract-owner')
   getContractOwner() {
     return this.callsService.getContractOwner();
+  }
+
+  @Get('proposal-counts')
+  getProposalCounts(@Query('callIds') callIds: string) {
+    const callIdsArray = callIds.split(',').filter(id => id.trim());
+    return this.callsService.getProposalCounts(callIdsArray);
   }
 } 

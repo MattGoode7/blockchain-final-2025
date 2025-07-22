@@ -14,5 +14,8 @@
   "license": "ISC",
   "devDependencies": {
     "truffle": "^5.11.5"
+  },
+  "dependencies": {
+    "eth-ens-namehash": "^2.0.8"
   }
 }

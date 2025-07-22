@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./CFP.sol";
+import "./LlamadosRegistrar.sol";
 
 contract CFPFactory {
     // Eventos con parámetros indexados para mejor filtrado
@@ -27,6 +28,7 @@ contract CFPFactory {
 
     // Variables de estado
     address private immutable _owner;
+    LlamadosRegistrar public llamadosRegistrar;
     address[] private _pending;
     address[] private _creators;
     mapping(bytes32 => CallForProposals) private _calls;
@@ -74,6 +76,15 @@ contract CFPFactory {
         _owner = msg.sender;
     }
 
+    /**
+     * Establece el LlamadosRegistrar después del deploy
+     * Solo puede ser llamado por el owner
+     */
+    function setLlamadosRegistrar(address _llamadosRegistrar) external onlyOwner {
+        require(address(llamadosRegistrar) == address(0), "LlamadosRegistrar ya establecido");
+        llamadosRegistrar = LlamadosRegistrar(_llamadosRegistrar);
+    }
+
     // Dirección del dueño de la factoría
     function owner() public view returns (address) {
         return _owner;
@@ -105,6 +116,25 @@ contract CFPFactory {
     }
 
     /**
+     * Crea un llamado con registro ENS
+     * Solo puede ser invocada por una cuenta autorizada
+     */
+    function createWithENS(
+        bytes32 callId,
+        uint256 timestamp
+    ) public onlyAuthorized(msg.sender) validCallId(callId) returns (CFP) {
+        require(address(llamadosRegistrar) != address(0), "LlamadosRegistrar no establecido");
+        
+        CFP newCFP = _createCFP(callId, timestamp, msg.sender);
+        
+        // Registrar en ENS usando el label hash del callId
+        bytes32 labelHash = keccak256(abi.encodePacked(callId));
+        llamadosRegistrar.register(labelHash, msg.sender);
+        
+        return newCFP;
+    }
+
+    /**
      * Crea un llamado, estableciendo a `creator` como creador del mismo.
      * Sólo puede ser invocada por el dueño de la factoría.
      * Se comporta en todos los demás aspectos como `createFor(bytes32 callId, uint timestamp)`
@@ -116,11 +146,35 @@ contract CFPFactory {
     )
         public
         onlyOwner
-        onlyAuthorized(creator)
         validCallId(callId)
         returns (CFP)
     {
         return _createCFP(callId, timestamp, creator);
+    }
+
+    /**
+     * Crea un llamado con registro ENS para un creador específico
+     * Solo puede ser invocada por el dueño de la factoría
+     */
+    function createForWithENS(
+        bytes32 callId,
+        uint timestamp,
+        address creator
+    )
+        public
+        onlyOwner
+        validCallId(callId)
+        returns (CFP)
+    {
+        require(address(llamadosRegistrar) != address(0), "LlamadosRegistrar no establecido");
+        
+        CFP newCFP = _createCFP(callId, timestamp, creator);
+        
+        // Registrar en ENS usando el label hash del callId
+        bytes32 labelHash = keccak256(abi.encodePacked(callId));
+        llamadosRegistrar.register(labelHash, creator);
+        
+        return newCFP;
     }
 
     // Devuelve la cantidad de cuentas que han creado llamados.
@@ -144,6 +198,12 @@ contract CFPFactory {
     // Devuelve la cantidad de llamados creados por `creator`
     function createdByCount(address creator) public view returns (uint256) {
         return _callsCreatedBy[creator].length;
+    }
+
+    // Devuelve los datos de un llamado específico
+    function getCallData(bytes32 callId) public view callExists(callId) returns (address creator, address cfpAddress) {
+        CallForProposals memory call = _calls[callId];
+        return (call.creator, address(call.cfp));
     }
 
     // Funcion privada para crear un nuevo llamado

@@ -137,3 +137,10 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Build files
+build/
+
+# Typechain files
+api/src/contracts/types/
+ui/src/types/

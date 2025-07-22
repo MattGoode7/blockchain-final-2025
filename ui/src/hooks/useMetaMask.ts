@@ -40,7 +40,7 @@ export function useMetamask() {
         address,
         isNetworkOk: true,
         isOwner,
-        isAuthorized: !isOwner && isAuthorized,
+        isAuthorized: isOwner || isAuthorized,
         error: null
       });
     } catch (error) {
@@ -86,7 +86,7 @@ export function useMetamask() {
         address,
         isNetworkOk: true,
         isOwner,
-        isAuthorized: !isOwner && isAuthorized,
+        isAuthorized: isOwner || isAuthorized,
         error: null
       });
     } catch (error) {

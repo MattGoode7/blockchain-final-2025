@@ -50,7 +50,7 @@ export class AuthorizationService {
     try {
       const tx = await factory.authorize(address);
       const receipt = await tx.wait();
-      if (receipt.status !== 1n && receipt.status !== 1) {
+      if (receipt && receipt.status !== 1) {
         throw new Error(INTERNAL_ERROR);
       }
       return { message: OK };
@@ -85,7 +85,7 @@ export class AuthorizationService {
     try {
       const tx = await factory.authorize(address);
       const receipt = await tx.wait();
-      if (receipt.status !== 1n && receipt.status !== 1) {
+      if (receipt && receipt.status !== 1) {
         throw new Error(INTERNAL_ERROR);
       }
       return { message: OK };
